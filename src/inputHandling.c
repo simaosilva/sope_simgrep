@@ -12,7 +12,7 @@ int checkArguments(Grep * grep, int argc, char * argv[]) {
     i = setGrepOptions(grep, argc, argv);
     //EXPRESSION
     if (i == argc) {
-        fprintf(stderr, "Wrong number of arguments...\n");
+        fprintf(stderr, "Wrong number of arguments, check usage...\n");
         exit(1);
     } else {
         setGrepExpression(grep, argv[i]);
