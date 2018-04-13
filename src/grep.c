@@ -15,6 +15,7 @@ Grep * createGrep() {
     ret->numberLinesFound = false;
     ret->recursive = false;
     ret->ignore = false;
+    ret->lineCount = 0;
     return ret;
 }
 
@@ -30,6 +31,7 @@ int setGrepOptions(Grep * grepOptions, int optionsSize, char * options[]) {
             continue;
         }
         if(strcmp(options[i], "-l") == 0) {
+            grepOptions->numberLinesFound = false;
             grepOptions->fileNameOnly = true;
             continue;
         }

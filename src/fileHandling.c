@@ -72,8 +72,16 @@ void processFile(char * fileName, Grep *grep) {
     size_t allocated_size;
     while(getline(&line, &allocated_size, file) != -1) {
         //run function that analyzes a line
-        if (findExpression(line, grep->expression, grep->ignore) != NULL)
-          printf("%s", line);
+        if (findExpression(line, grep->expression, grep->ignore) != NULL) {
+            if (!grep->fileNameOnly) {
+                if (!grep->numberLinesFound) {
+                    printf("%s", line);
+                } else {
+                    grep->lineCount++;
+                }
+                printf("%s\n", fileName);
+            }
+        }
     }
     fclose(file);
 }
