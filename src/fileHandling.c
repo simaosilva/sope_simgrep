@@ -82,6 +82,7 @@ void searchDirs(char * dirName, Grep * grep) {
         }
         else if (pid == 0) {
           searchDirs(name, grep);
+          exit(0);
         }
         else {
           perror("Couldn't process fork...");
@@ -98,9 +99,8 @@ void searchDirs(char * dirName, Grep * grep) {
       exit(8);
     }
   }
-  
+
   closedir(dirp);
-  exit(0);
 }
 
 void processFile(char * fileName, Grep *grep) {
