@@ -17,7 +17,7 @@ void sigint_handler(int sig) {
         return;
     else {
         printf("Unrecognized character...\n");
-        sigint_handler(SIGINT);
+        sigint_handler(sig);
     }
 }
 
