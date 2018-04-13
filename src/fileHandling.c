@@ -12,6 +12,7 @@
 #include "fileHandling.h"
 #include "lineHandling.h"
 
+
 void searchDirs(char * dirName, Grep * grep) {
   int pid;
   int status;
@@ -21,22 +22,24 @@ void searchDirs(char * dirName, Grep * grep) {
   if (pid > 0) {
     wait(&status);
   } else if (pid == 0) {
-    DIR *dirp;
-    struct dirent *direntp;
-    struct stat stat_buf;
-    char name[200];
+
+      DIR *dirp;
+      struct dirent *direntp;
+      struct stat stat_buf;
+      char name[200];
 
     if ((dirp = opendir(dirName)) == NULL) { // if the argument specified for the file parameter is just that, a file, then this will be null, and if we error check the file won't be analyzed
-    processFile(dirName, grep, name);
-  }
+      processFile(dirName, grep, name);
+    }
 
   while ((direntp = readdir(dirp)) != NULL) {
     sprintf(name, "%s/%s", dirName, direntp->d_name);
-    if (lstat(direntp->d_name, &stat_buf) == -1)
-    {
-      perror("lstat ERROR");
+
+    if (lstat(name, &stat_buf) == -1) {
+      perror(name);
       exit(3);
     }
+
     if (S_ISREG(stat_buf.st_mode)) {
       //run function that checks if the file should be analyzed
       processFile(name, grep, name);
