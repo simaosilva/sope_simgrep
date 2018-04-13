@@ -15,7 +15,7 @@ typedef struct grep_t {
     bool word;
     bool recursive;
     char * expression;
-    char * file;
+    char * file;    // file or directory
 } Grep;
 
 /*

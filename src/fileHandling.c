@@ -10,6 +10,7 @@
 #include <sys/wait.h>
 #include <string.h>
 #include "fileHandling.h"
+#include "boyer_moore.h"
 
 void searchDirs(char * dirName, Grep * grep) {
     int pid;
@@ -26,7 +27,7 @@ void searchDirs(char * dirName, Grep * grep) {
         char name[200];
 
         if ((dirp = opendir(dirName)) == NULL) { // if the argument specified for the file parameter is just that, a file, then this will be null, and if we error check the file won't be analyzed
-                processFile(dirName);
+                processFile(dirName, grep->expression);
         }
 
         while ((direntp = readdir(dirp)) != NULL) {
@@ -38,7 +39,7 @@ void searchDirs(char * dirName, Grep * grep) {
             }
             if (S_ISREG(stat_buf.st_mode)) {
                 //run function that checks if the file should be analyzed
-                processFile(name);
+                processFile(name, grep->expression);
             } else if (S_ISDIR(stat_buf.st_mode)) {
 
                 if (!grep->recursive) {
@@ -61,16 +62,18 @@ void searchDirs(char * dirName, Grep * grep) {
     }
 }
 
-void processFile(char * fileName) {
+void processFile(char * fileName, char *pat) {
     FILE * file = fopen(fileName, "r");
     if (file == NULL) {
         perror("Couldn't open file...");
         exit(1);
     }
-    char line[256];
-    while(fgets(line, sizeof(line), file)) {
+    char *line = NULL;
+    size_t allocated_size;
+    while(getline(&line, &allocated_size, file) != -1) {
         //run function that analyzes a line
-        //TODO
+        if (boyer_moore((uint8_t*) line, strlen(line), (uint8_t*) pat, strlen(pat)) != NULL)
+          printf("%s", line);
     }
     fclose(file);
 }
