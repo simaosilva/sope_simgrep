@@ -66,14 +66,23 @@ int setGrepExpression(Grep* grep, char * expression) {
 
 int setGrepFile(Grep * grep, char * file) {
     size_t len = strlen(file);
+<<<<<<< HEAD
     grep->expression = (char*) malloc (len);
     if (grep->expression == NULL) { //grep->file
+=======
+    grep->file = (char*) malloc (len);
+    if (grep->file == NULL) {
+>>>>>>> 017f99b54c318e174d656ab73cd4f1b8c650e9fa
         perror("Unable to allocate memory\n");
         return -1;
     }
     size_t i;
     for(i=0;i<len;i++) {
+<<<<<<< HEAD
         grep->expression[i] = file[i];    // grep->file
+=======
+        grep->file[i] = file[i];
+>>>>>>> 017f99b54c318e174d656ab73cd4f1b8c650e9fa
     }
     return 0;
 }
