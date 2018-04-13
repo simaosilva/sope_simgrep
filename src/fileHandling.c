@@ -27,7 +27,7 @@ void searchDirs(char * dirName, Grep * grep) {
         char name[200];
 
         if ((dirp = opendir(dirName)) == NULL) { // if the argument specified for the file parameter is just that, a file, then this will be null, and if we error check the file won't be analyzed
-                processFile(dirName, grep->expression);
+                processFile(dirName, grep);
         }
 
         while ((direntp = readdir(dirp)) != NULL) {
@@ -39,7 +39,7 @@ void searchDirs(char * dirName, Grep * grep) {
             }
             if (S_ISREG(stat_buf.st_mode)) {
                 //run function that checks if the file should be analyzed
-                processFile(name, grep->expression);
+                processFile(name, grep);
             } else if (S_ISDIR(stat_buf.st_mode)) {
 
                 if (!grep->recursive) {
@@ -62,7 +62,7 @@ void searchDirs(char * dirName, Grep * grep) {
     }
 }
 
-void processFile(char * fileName, char *pat) {
+void processFile(char * fileName, Grep *grep) {
     FILE * file = fopen(fileName, "r");
     if (file == NULL) {
         perror("Couldn't open file...");
@@ -72,7 +72,7 @@ void processFile(char * fileName, char *pat) {
     size_t allocated_size;
     while(getline(&line, &allocated_size, file) != -1) {
         //run function that analyzes a line
-        if (findExpression(line, pat) != NULL)
+        if (findExpression(line, grep->expression, grep->ignore) != NULL)
           printf("%s", line);
     }
     fclose(file);

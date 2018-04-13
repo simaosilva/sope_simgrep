@@ -23,7 +23,7 @@ void sigint_handler(int sig) {
 
 int main(int argc, char * argv[]) {
 
-    if (argc == 1 || argc > 4) {
+    if (argc == 1) {
       printf("USAGE: %s [options] pattern [file/dir]\n", argv[0]);
       return 1;
     }

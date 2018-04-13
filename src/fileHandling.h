@@ -9,7 +9,7 @@
 
 void searchDirs(char * dirName,  Grep * grep);
 
-void processFile(char * fileName, char *pat);
+void processFile(char * fileName, Grep *grep);
 
 
 
