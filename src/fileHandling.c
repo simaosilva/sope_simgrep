@@ -79,6 +79,7 @@ void processFile(char * fileName, Grep *grep) {
                 } else {
                     grep->lineCount++;
                 }
+            } else {
                 printf("%s\n", fileName);
             }
         }
