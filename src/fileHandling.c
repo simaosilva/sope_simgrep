@@ -73,19 +73,23 @@ void processFile(char * fileName, Grep *grep, char *path) {
   }
   char *line = NULL;
   size_t allocated_size;
+  int lineNumber = 0;
   while(getline(&line, &allocated_size, file) != -1) {
+      lineNumber++;
     //run function that analyzes a line
     if (findExpression(line, grep->expression, grep->ignore) != NULL) {
+        if(grep->lineNumber)
+            printf("%d: ", lineNumber);
 
-      if (grep->recursive) {
-        printf("%s:", path);
-      }
+        if (grep->recursive) {
+            printf("%s:", path);
+        }
 
-      if (!grep->fileNameOnly) {
-        if (!grep->numberLinesFound) {
-          printf("%s", line);
-        } else {
-          grep->lineCount++;
+        if (!grep->fileNameOnly) {
+            if (!grep->numberLinesFound) {
+                printf("%s", line);
+            } else {
+                grep->lineCount++;
         }
       } else {
         printf("%s\n", fileName);
