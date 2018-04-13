@@ -92,5 +92,6 @@ void processFile(char * fileName, Grep *grep, char *path) {
       }
     }
   }
+  free(line);
   fclose(file);
 }

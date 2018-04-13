@@ -19,7 +19,7 @@ Grep * createGrep() {
   ret->expression = NULL;
   ret->file = NULL;
   ret->lineCount = 0;
-  
+
   return ret;
 }
 
@@ -35,7 +35,6 @@ int setGrepOptions(Grep * grepOptions, int optionsSize, char * options[]) {
       continue;
     }
     if(strcmp(options[i], "-l") == 0) {
-      grepOptions->numberLinesFound = false;
       grepOptions->fileNameOnly = true;
       continue;
     }
@@ -53,6 +52,12 @@ int setGrepOptions(Grep * grepOptions, int optionsSize, char * options[]) {
     }
     break;
   }
+
+  if (grepOptions->fileNameOnly) {
+    grepOptions->numberLinesFound = false;
+    grepOptions->lineNumber = false;
+  }
+
   return i;
 }
 
