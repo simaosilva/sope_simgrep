@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include "inputHandling.h"
 #include "fileHandling.h"
+#include "grep.h"
 
 void sigint_handler(int sig) {
     char c;

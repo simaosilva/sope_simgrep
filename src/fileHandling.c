@@ -10,7 +10,7 @@
 #include <sys/wait.h>
 #include <string.h>
 #include "fileHandling.h"
-#include "boyer_moore.h"
+#include "lineHandling.h"
 
 void searchDirs(char * dirName, Grep * grep) {
     int pid;
@@ -72,7 +72,7 @@ void processFile(char * fileName, char *pat) {
     size_t allocated_size;
     while(getline(&line, &allocated_size, file) != -1) {
         //run function that analyzes a line
-        if (boyer_moore((uint8_t*) line, strlen(line), (uint8_t*) pat, strlen(pat)) != NULL)
+        if (findExpression(line, pat) != NULL)
           printf("%s", line);
     }
     fclose(file);
