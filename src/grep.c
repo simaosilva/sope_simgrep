@@ -19,8 +19,8 @@ Grep * createGrep() {
 }
 
 int setGrepOptions(Grep * grepOptions, int optionsSize, char * options[]) {
-    int i = 0;
-    for (i = 2; i < optionsSize; i++) {
+    int i;
+    for (i = 1; i < optionsSize; i++) {
         if(strcmp(options[i], "-c") == 0) {
             grepOptions->numberLinesFound = true;
             continue;

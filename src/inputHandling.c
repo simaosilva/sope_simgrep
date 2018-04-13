@@ -3,6 +3,7 @@
 //
 
 #include <stdio.h>
+#include <stdlib.h>
 #include "inputHandling.h"
 
 int checkArguments(Grep * grep, int argc, char * argv[]) {
@@ -11,8 +12,8 @@ int checkArguments(Grep * grep, int argc, char * argv[]) {
     i = setGrepOptions(grep, argc, argv);
     //EXPRESSION
     if (i == argc) {
-        perror("Incorrect number of arguments given, check usage\n");
-        return -1;
+        fprintf(stderr, "Wrong number of arguments...\n");
+        exit(1);
     } else {
         setGrepExpression(grep, argv[i]);
     }
