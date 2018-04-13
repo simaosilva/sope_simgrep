@@ -25,21 +25,20 @@ void searchDirs(char * dirName, Grep * grep) {
         struct stat stat_buf;
         char name[200];
 
-        if ((dirp = opendir(dirName)) == NULL) {
-            perror("Couldn't open the directory...\n");
-            exit(2);
+        if ((dirp = opendir(dirName)) == NULL) { // if the argument specified for the file parameter is just that, a file, then this will be null, and if we error check the file won't be analyzed
+                processFile(dirName);
         }
 
         while ((direntp = readdir(dirp)) != NULL) {
             sprintf(name, "%s/%s", dirName, direntp->d_name);
             if (lstat(direntp->d_name, &stat_buf) == -1)
             {
-                perror("lstat ERROR\n");
+                perror("lstat ERROR");
                 exit(3);
             }
             if (S_ISREG(stat_buf.st_mode)) {
                 //run function that checks if the file should be analyzed
-                processFile(name, direntp, stat_buf);
+                processFile(name);
             } else if (S_ISDIR(stat_buf.st_mode)) {
 
                 if (!grep->recursive) {
@@ -57,15 +56,15 @@ void searchDirs(char * dirName, Grep * grep) {
         closedir(dirp);
         exit(0);
     } else if (pid < 0) {
-        perror("Couldn't process fork...\n");
+        perror("Couldn't process fork...");
         exit(1);
     }
 }
 
-void processFile(char * fileName, struct dirent * direntp, struct stat stat_buf) {
+void processFile(char * fileName) {
     FILE * file = fopen(fileName, "r");
     if (file == NULL) {
-        perror("Couldn't open file...\n");
+        perror("Couldn't open file...");
         exit(1);
     }
     char line[256];

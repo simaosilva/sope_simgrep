@@ -66,14 +66,14 @@ int setGrepExpression(Grep* grep, char * expression) {
 
 int setGrepFile(Grep * grep, char * file) {
     size_t len = strlen(file);
-    grep->expression = (char*) malloc (len);
-    if (grep->expression == NULL) {
+    grep->file = (char*) malloc (len);
+    if (grep->file == NULL) {
         perror("Unable to allocate memory\n");
         return -1;
     }
     size_t i;
     for(i=0;i<len;i++) {
-        grep->expression[i] = file[i];
+        grep->file[i] = file[i];
     }
     return 0;
 }
