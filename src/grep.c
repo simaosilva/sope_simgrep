@@ -18,7 +18,6 @@ Grep * createGrep() {
   ret->recursive = false;
   ret->expression = NULL;
   ret->file = NULL;
-  ret->lineCount = 0;
 
   return ret;
 }

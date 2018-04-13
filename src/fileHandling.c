@@ -14,23 +14,19 @@
 
 
 void searchDirs(char * dirName, Grep * grep) {
-  int pid;
-  int status;
+  int pid, ret;
+  int child_counter = 0;
 
-  pid = fork();
+  DIR *dirp;
+  struct dirent *direntp;
+  struct stat stat_buf;
+  char name[200];
 
-  if (pid > 0) {
-    wait(&status);
-  } else if (pid == 0) {
-
-      DIR *dirp;
-      struct dirent *direntp;
-      struct stat stat_buf;
-      char name[200];
-
-    if ((dirp = opendir(dirName)) == NULL) { // if the argument specified for the file parameter is just that, a file, then this will be null, and if we error check the file won't be analyzed
-      processFile(dirName, grep, name);
-    }
+  // if the argument specified for the file parameter is just that, a file, then this will be null, and if we error check the file won't be analyzed
+  if ((dirp = opendir(dirName)) == NULL) {
+    grep->recursive = false;
+    processFile(dirName, grep);
+  }
 
   while ((direntp = readdir(dirp)) != NULL) {
     sprintf(name, "%s/%s", dirName, direntp->d_name);
@@ -42,7 +38,26 @@ void searchDirs(char * dirName, Grep * grep) {
 
     if (S_ISREG(stat_buf.st_mode)) {
       //run function that checks if the file should be analyzed
-      processFile(name, grep, name);
+      pid = fork();
+      if (pid > 0) {
+        child_counter++;
+
+        if ( (ret = waitpid(-1, NULL, WNOHANG)) == -1) {  // check if some child had returned
+          perror("waitpid()");
+          exit(6);
+        }
+        else if (ret > 0) {
+          child_counter--;
+        }
+      }
+      else if (pid == 0) {
+        processFile(name, grep);
+        exit(0);
+      }
+      else {
+        perror("Couldn't process fork...");
+        exit(1);
+      }
     } else if (S_ISDIR(stat_buf.st_mode)) {
 
       if (!grep->recursive) {
@@ -52,50 +67,86 @@ void searchDirs(char * dirName, Grep * grep) {
 
       if (strcmp(direntp->d_name, ".") != 0 && strcmp(direntp->d_name, "..") != 0) {
         //recursively call the function to search all directories
-        searchDirs(name, grep);
+        pid = fork();
+        if (pid > 0) {
+          child_counter++;
+
+          if ( (ret = waitpid(-1, NULL, WNOHANG)) == -1) {     // check if some child had returned
+            perror("waitpid()");
+            exit(6);
+          }
+          else if (ret > 0) {
+            child_counter--;
+          }
+        }
+        else if (pid == 0) {
+          searchDirs(name, grep);
+        }
+        else {
+          perror("Couldn't process fork...");
+          exit(1);
+        }
       }
     }
   }
 
+  // wait for all childs
+  while (child_counter-- > 0) {
+    if (wait(NULL) == -1) {
+      perror("wait()");
+      exit(8);
+    }
+  }
+  
   closedir(dirp);
   exit(0);
-} else if (pid < 0) {
-  perror("Couldn't process fork...");
-  exit(1);
-}
 }
 
-void processFile(char * fileName, Grep *grep, char *path) {
+void processFile(char * fileName, Grep *grep) {
   FILE * file = fopen(fileName, "r");
   if (file == NULL) {
     perror("Couldn't open file...");
     exit(1);
   }
+
   char *line = NULL;
   size_t allocated_size;
-  int lineNumber = 0;
+  int lineNumber = 0, lineCounter = 0;
+
   while(getline(&line, &allocated_size, file) != -1) {
-      lineNumber++;
+    char string_to_print[200] = {0};
+    lineNumber++;
     //run function that analyzes a line
     if (findExpression(line, grep->expression, grep->ignore) != NULL) {
-        if(grep->lineNumber)
-            printf("%d: ", lineNumber);
 
+      if (grep->numberLinesFound) {
+        lineCounter++;
+      }
+      else {
+        if (grep->fileNameOnly) {
+          printf("%s\n", fileName);
+          free(line);
+          fclose(file);
+          return;
+        }
         if (grep->recursive) {
-            printf("%s:", path);
+          sprintf(string_to_print, "%s:", fileName);
         }
-
-        if (!grep->fileNameOnly) {
-            if (!grep->numberLinesFound) {
-                printf("%s", line);
-            } else {
-                grep->lineCount++;
+        if(grep->lineNumber) {
+          sprintf(string_to_print, "%s%d:", string_to_print, lineNumber);
         }
-      } else {
-        printf("%s\n", fileName);
+        printf("%s%s", string_to_print, line);
       }
     }
   }
+
+  if (grep->numberLinesFound && grep->recursive) {
+    printf("%s:%d\n", fileName, lineCounter);
+  }
+  else if (grep->numberLinesFound && !grep->recursive){
+    printf("%d\n", lineCounter);
+  }
+
   free(line);
   fclose(file);
 }
