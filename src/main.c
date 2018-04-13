@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <signal.h>
 #include <stdlib.h>
+#include <sys/wait.h>
+#include <unistd.h>
 #include "inputHandling.h"
 #include "fileHandling.h"
 
@@ -8,23 +10,13 @@ void sigint_handler(int sig) {
     char c;
     printf("\n > Are you sure you want to terminate (Y/N)? ");
     c = getchar();
-    int valid = 1, tries = 0;
-
-    while (valid) {
-        if (tries > 5) {
-            printf("Number of tries exceed, resuming execution...\n");
-            valid = 0;
-            continue;
-        }
-        if (c == 'y' || c == 'Y')
-            exit(0);
-        else if (c == 'n' || c == 'N')
-            return;
-        else {
-            printf("Unrecognized character...\n");
-            tries++;
-            sigint_handler(SIGINT);
-        }
+    if (c == 'y' || c == 'Y')
+        exit(0);
+    else if (c == 'n' || c == 'N')
+        return;
+    else {
+        printf("Unrecognized character...\n");
+        sigint_handler(SIGINT);
     }
 }
 
