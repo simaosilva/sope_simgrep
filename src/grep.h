@@ -37,6 +37,6 @@ int setGrepFile(Grep * grep, char * file);
 /*
  * Deletes a GrepOptions struct
  */
-int deleteGrep(Grep * p);
+void deleteGrep(Grep * p);
 
 #endif //PROJETO_GREPOPTIONS_H

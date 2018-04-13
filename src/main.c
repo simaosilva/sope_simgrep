@@ -22,6 +22,11 @@ void sigint_handler(int sig) {
 
 int main(int argc, char * argv[]) {
 
+    if (argc == 1 || argc > 4) {
+      printf("USAGE: %s [options] pattern [file/dir]\n", argv[0]);
+      return 1;
+    }
+
     /*******************************/
     /******* SIGNAL HANDLING *******/
     /*******************************/
@@ -31,9 +36,9 @@ int main(int argc, char * argv[]) {
     sigemptyset(&action.sa_mask);
     action.sa_flags = 0;
 
-    if (sigaction(SIGINT ,&action,NULL) < 0) {
+    if (sigaction(SIGINT ,&action, NULL) < 0) {
         fprintf(stderr,"Unable to install SIGINT handler...\n");
-        exit(1);
+        exit(2);
     }
 
     /*****************************/
@@ -42,20 +47,9 @@ int main(int argc, char * argv[]) {
 
     Grep * grep = createGrep();
     if (checkArguments(grep, argc, argv) != 0) {
-        return 1;
+        return 3;
     }
     searchDirs(grep->file, grep);
     deleteGrep(grep);
     return 0;
-
-    /*********************/
-    /******* TESTS *******/
-    /*********************/
-
-/*    char linha[] = "This eBook is for the use of anyone anywhere at no cost and with";
-    char search[] = "eBook";
-    printf("%d\n", (int) strlen(linha));
-    printf("%d\n", (int) strlen(search));
-    printf("%s\n", boyer_moore((uint8_t*) linha, strlen(linha), (uint8_t*) search, strlen(search)));
-    return 0;*/
 }
