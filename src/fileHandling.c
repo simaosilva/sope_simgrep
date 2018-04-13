@@ -26,6 +26,7 @@ void searchDirs(char * dirName, Grep * grep) {
   if ((dirp = opendir(dirName)) == NULL) {
     grep->recursive = false;
     processFile(dirName, grep);
+    return;
   }
 
   while ((direntp = readdir(dirp)) != NULL) {
@@ -117,7 +118,7 @@ void processFile(char * fileName, Grep *grep) {
     char string_to_print[200] = {0};
     lineNumber++;
     //run function that analyzes a line
-    if (findExpression(line, grep->expression, grep->ignore) != NULL) {
+    if (findExpression(line, grep->expression, grep->ignore, grep->word) != NULL) {
 
       if (grep->numberLinesFound) {
         lineCounter++;

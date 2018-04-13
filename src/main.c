@@ -1,11 +1,8 @@
 #include <stdio.h>
 #include <signal.h>
 #include <stdlib.h>
-#include <sys/wait.h>
-#include <unistd.h>
 #include "inputHandling.h"
 #include "fileHandling.h"
-#include "grep.h"
 
 void sigint_handler(int sig) {
     char c;
@@ -17,7 +14,7 @@ void sigint_handler(int sig) {
         return;
     else {
         printf("Unrecognized character...\n");
-        sigint_handler(SIGINT);
+        sigint_handler(sig);
     }
 }
 
