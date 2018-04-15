@@ -23,12 +23,12 @@ void searchDirs(char * dirName, Grep * grep) {
   char name[200];
 
   // if the argument specified for the file parameter is just that, a file, then this will be null, and if we error check the file won't be analyzed
-  if ((dirp = opendir(dirName)) == NULL) {
+  if (grep->file == NULL || (dirp = opendir(dirName)) == NULL ) {
     grep->recursive = false;
     processFile(dirName, grep);
     return;
   }
-
+  
   while ((direntp = readdir(dirp)) != NULL) {
     sprintf(name, "%s/%s", dirName, direntp->d_name);
 
@@ -104,7 +104,13 @@ void searchDirs(char * dirName, Grep * grep) {
 }
 
 void processFile(char * fileName, Grep *grep) {
-  FILE * file = fopen(fileName, "r");
+  FILE * file;
+  if (grep->file == NULL) {
+    file = fdopen(STDIN_FILENO, "r");
+  }
+  else {
+    file = fopen(fileName, "r");
+  }
   if (file == NULL) {
     perror("Couldn't open file...");
     exit(1);
